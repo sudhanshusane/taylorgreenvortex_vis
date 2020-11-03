@@ -1,6 +1,8 @@
 #include <vtkm/io/VTKDataSetReader.h>
 #include <vtkm/io/VTKDataSetWriter.h>
 #include <vtkm/cont/DataSet.h>
+#include <vtkm/cont/VariantArrayHandle.h>
+#include <vtkm/cont/ArrayHandleVirtual.h>
 #include <vtkm/cont/Initialize.h>
 #include <vtkm/filter/Streamline.h>
 #include <iostream>
@@ -14,14 +16,31 @@ int main(int argc, char *argv[])
 	
 	// Add a composite array to the dataset which is a single velocity field.
 
+  vtkm::cont::VariantArrayHandle field_u = ds.GetField("u").GetData();
+  vtkm::cont::VariantArrayHandle field_v = ds.GetField("v").GetData();
+  vtkm::cont::VariantArrayHandle field_w = ds.GetField("w").GetData();
+
+  vtkm::cont::ArrayHandleVirtual<vtkm::Float64> u_FieldArray =  field_u.AsVirtual<vtkm::Float64>();
+  vtkm::cont::ArrayHandle<vtkm::Float64> u_fieldArray = u_FieldArray.Cast<vtkm::cont::ArrayHandle<vtkm::Float64>>();
+  
+	vtkm::cont::ArrayHandleVirtual<vtkm::Float64> v_FieldArray =  field_v.AsVirtual<vtkm::Float64>();
+  vtkm::cont::ArrayHandle<vtkm::Float64> v_fieldArray = v_FieldArray.Cast<vtkm::cont::ArrayHandle<vtkm::Float64>>();
+  
+	vtkm::cont::ArrayHandleVirtual<vtkm::Float64> w_FieldArray =  field_w.AsVirtual<vtkm::Float64>();
+  vtkm::cont::ArrayHandle<vtkm::Float64> w_fieldArray = w_FieldArray.Cast<vtkm::cont::ArrayHandle<vtkm::Float64>>();
+	
+	auto u_val = u_fieldArray.ReadPortal();
+	auto v_val = v_fieldArray.ReadPortal();
+	auto w_val = w_fieldArray.ReadPortal();
+
 
 	std::vector<vtkm::Vec3f> vel_field;
 	float u,v,w;
 	for(int i = 0; i < ds.GetNumberOfPoints(); i++)
 	{
-		u = 0.0;
-		v = 0.0;
-		w = 0.0;
+		u = u_val.Get(i);
+		v = v_val.Get(i);
+		w = w_val.Get(i);
 		vel_field.push_back(vtkm::Vec3f(u, v, w));
 	}
 	
