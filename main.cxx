@@ -6,6 +6,7 @@
 #include <vtkm/cont/Initialize.h>
 #include <vtkm/filter/Streamline.h>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <stdlib.h>
 
@@ -53,18 +54,29 @@ int main(int argc, char *argv[])
 	float stepSize = atof(argv[4]);
 	int numSteps = atoi(argv[5]);
 	
+	std::ifstream stream(argv[7]);	
+	float x,y,z;
+	
   vtkm::Bounds bounds = ds.GetCoordinateSystem().GetBounds();
   std::vector<vtkm::Particle> seeds;
 
   for (vtkm::Id i = 0; i < numSeeds; i++)
   {
     vtkm::Particle p;
-    vtkm::FloatDefault rx = (vtkm::FloatDefault)rand() / (vtkm::FloatDefault)RAND_MAX;
-    vtkm::FloatDefault ry = (vtkm::FloatDefault)rand() / (vtkm::FloatDefault)RAND_MAX;
-    vtkm::FloatDefault rz = (vtkm::FloatDefault)rand() / (vtkm::FloatDefault)RAND_MAX;
-    p.Pos[0] = static_cast<vtkm::FloatDefault>(bounds.X.Min + rx * bounds.X.Length());
-    p.Pos[1] = static_cast<vtkm::FloatDefault>(bounds.Y.Min + ry * bounds.Y.Length());
-    p.Pos[2] = static_cast<vtkm::FloatDefault>(bounds.Z.Min + rz * bounds.Z.Length());
+//    vtkm::FloatDefault rx = (vtkm::FloatDefault)rand() / (vtkm::FloatDefault)RAND_MAX;
+//    vtkm::FloatDefault ry = (vtkm::FloatDefault)rand() / (vtkm::FloatDefault)RAND_MAX;
+//    vtkm::FloatDefault rz = (vtkm::FloatDefault)rand() / (vtkm::FloatDefault)RAND_MAX;
+//    p.Pos[0] = static_cast<vtkm::FloatDefault>(bounds.X.Min + rx * bounds.X.Length());
+//    p.Pos[1] = static_cast<vtkm::FloatDefault>(bounds.Y.Min + ry * bounds.Y.Length());
+//    p.Pos[2] = static_cast<vtkm::FloatDefault>(bounds.Z.Min + rz * bounds.Z.Length());
+
+		stream >> x;
+		stream >> y;
+		stream >> z;
+
+		p.Pos[0] = static_cast<vtkm::FloatDefault>(x);
+		p.Pos[1] = static_cast<vtkm::FloatDefault>(y);
+		p.Pos[2] = static_cast<vtkm::FloatDefault>(z);
     p.ID = i;
     seeds.push_back(p);
   }
